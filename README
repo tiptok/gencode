@@ -1,0 +1,43 @@
+## 使用教程
+```
+1. mkdir Project
+2. cd Project & go mod init github.com/tiptok/xx
+3. go run gencode.go api-dsl -p dsl/Project -c Controller - url /controller/method
+4. 修改dsl 生成的 Request/Response
+5.  go run gencode.go api-svr -p dsl/Project --st Project
+6.  go run gencode.go dm -p dsl/Project --st Project
+
+
+go run gencode.go api-dsl -p F://go//src//learn_project//ddd-project//order -c Order - url controller/orderList
+go run gencode.go api-svr -p F://go//src//learn_project//ddd-project//order --st F://go//src//order
+go run gencode.go dm -p F://go//src//learn_project//ddd-project//order  --st F://go//src//order
+
+注：
+dsl/Project 描述语言项目地址
+Project     生成代码的地址
+```
+
+## api-dsl gen
+```
+go run gencode.go api-dsl -p F://go//src//learn_project//ddd-project//stock -c Order -url order/orderDetail
+```
+
+## api-svr gen
+```
+go run gencode.go api-svr -p F://go//src//learn_project//ddd-project//stock --st F://go//src//stock
+```
+
+## dm  domain-model
+```
+go run gencode.go dm -p F://go//src//learn_project//ddd-project//stock  --st F://go//src//stock
+```
+
+## 功能实现
+- [x] api-dsl 生成描述语言
+- [x] api-svr 根据描述语言生成服务代码
+- [x] dm      根据描述语言（domain-model）生成,存储模型,领域模型
+- [ ] api-svr -t api-dsl dm-dsl 生成对应svr
+- [ ] dsl     生成描述语言 ( -t api/dm/dm-svr/event)
+- [ ] swagger 生成swagger文档
+- [ ] btt     生成自动化测试代码 (BTT)
+- [ ] arch-ref自动引入架构 (redis/broker/)
