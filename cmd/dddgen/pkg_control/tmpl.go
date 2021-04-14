@@ -6,7 +6,7 @@ import "os"
 
 var REDIS_HOST = "127.0.0.1"
 var REDIS_PORT = "6379"
-var REDIS_AUTH = "123456"
+var REDIS_AUTH = ""
 
 func init() {
 	if os.Getenv("REDIS_HOST") != "" {
@@ -26,6 +26,7 @@ const tmplRedisInit = `package redis
 import (
 	"fmt"
 	"github.com/tiptok/gocomm/pkg/cache"
+    "github.com/tiptok/gocomm/pkg/cache/gzcache"
 	"github.com/tiptok/gocomm/pkg/log"
 	"github.com/tiptok/gocomm/pkg/redis"
 )
@@ -36,5 +37,7 @@ func init() {
 	if err != nil {
 		log.Error(err)
 	}
-	cache.InitDefault(cache.WithDefaultRedisPool(redis.GetRedisPool()))
+	//cache.InitDefault(cache.WithDefaultRedisPool(redis.GetRedisPool()))
+	cache.InitMultiLevelCache(cache.WithDebugLog(true,log.Logger))
+	cache.RegisterCache(gzcache.NewNodeCache(constant.REDIS_HOST+":"+constant.REDIS_PORT,constant.REDIS_AUTH))
 }`

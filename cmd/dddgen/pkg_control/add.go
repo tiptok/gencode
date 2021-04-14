@@ -33,16 +33,18 @@ func AddPackage(o model.SvrOptions, result chan *api.GenResult) {
 	switch o.Lib {
 	case "redis":
 		result <- &api.GenResult{
-			Root:     o.SaveTo,
-			SaveTo:   `/pkg/constant`,
-			FileName: common.LowCasePaddingUnderline("redis") + ".go",
-			FileData: []byte(tmplConstantRedis),
+			Root:        o.SaveTo,
+			SaveTo:      `/pkg/constant`,
+			FileName:    common.LowCasePaddingUnderline("redis") + ".go",
+			FileData:    []byte(tmplConstantRedis),
+			JumpExisted: true,
 		}
 		result <- &api.GenResult{
-			Root:     o.SaveTo,
-			SaveTo:   `/pkg/infrastructure/redis`,
-			FileName: common.LowCasePaddingUnderline("init") + ".go",
-			FileData: []byte(tmplRedisInit),
+			Root:        o.SaveTo,
+			SaveTo:      `/pkg/infrastructure/redis`,
+			FileName:    common.LowCasePaddingUnderline("init") + ".go",
+			FileData:    []byte(tmplRedisInit),
+			JumpExisted: true,
 		}
 		break
 	}

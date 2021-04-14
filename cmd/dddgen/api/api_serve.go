@@ -69,7 +69,7 @@ func GenApiServer(serveGen ServeGen, o model.SvrOptions, controllers []Controlle
 	go func() {
 		for result := range results {
 			filePath := filepath.Join(result.Root, result.SaveTo, result.FileName)
-			if common.FileExists(filePath) && result.CoverExists {
+			if common.FileExists(filePath) && result.JumpExisted {
 				log.Println("【gen code】 jump:", filePath)
 				continue
 			}
@@ -116,7 +116,7 @@ func genFactoryTransaction(options model.SvrOptions, result chan<- *GenResult) (
 		SaveTo:      constant.WithApplication("factory"),
 		FileName:    common.LowCasePaddingUnderline("transaction") + ".go",
 		FileData:    buf.Bytes(),
-		CoverExists: true,
+		JumpExisted: true,
 	}
 	return nil
 }
@@ -131,10 +131,11 @@ func genBeegoRouterInit(options model.SvrOptions, result chan<- *GenResult) (err
 		return err
 	}
 	result <- &GenResult{
-		Root:     options.SaveTo,
-		SaveTo:   constant.WithPort(options.Lib),
-		FileName: common.LowCasePaddingUnderline(options.Lib) + ".go",
-		FileData: buf.Bytes(),
+		Root:        options.SaveTo,
+		SaveTo:      constant.WithPort(options.Lib),
+		FileName:    common.LowCasePaddingUnderline(options.Lib) + ".go",
+		FileData:    buf.Bytes(),
+		JumpExisted: true,
 	}
 	return nil
 }
@@ -149,10 +150,11 @@ func genBeegoMain(options model.SvrOptions, result chan<- *GenResult) (err error
 		return err
 	}
 	result <- &GenResult{
-		Root:     options.SaveTo,
-		SaveTo:   "",
-		FileName: "main.go",
-		FileData: buf.Bytes(),
+		Root:        options.SaveTo,
+		SaveTo:      "",
+		FileName:    "main.go",
+		FileData:    buf.Bytes(),
+		JumpExisted: true,
 	}
 	return nil
 }
@@ -237,10 +239,11 @@ func (g GoBeeApiServeGen) GenController(c Controller, options model.SvrOptions, 
 	}
 
 	result <- &GenResult{
-		Root:     options.SaveTo,
-		SaveTo:   constant.WithController(options.Lib),
-		FileName: common.LowCasePaddingUnderline(c.Controller) + ".go",
-		FileData: buf.Bytes(),
+		Root:        options.SaveTo,
+		SaveTo:      constant.WithController(options.Lib),
+		FileName:    common.LowCasePaddingUnderline(c.Controller) + ".go",
+		FileData:    buf.Bytes(),
+		JumpExisted: true,
 	}
 
 	baseBuf := bytes.NewBuffer(nil)
@@ -254,7 +257,7 @@ func (g GoBeeApiServeGen) GenController(c Controller, options model.SvrOptions, 
 		SaveTo:      constant.WithController(options.Lib),
 		FileName:    "base.go",
 		FileData:    baseBuf.Bytes(),
-		CoverExists: true,
+		JumpExisted: true,
 	}
 	return nil
 }
@@ -286,10 +289,11 @@ func (g GoBeeApiServeGen) GenRouter(c Controller, options model.SvrOptions, resu
 	}
 
 	result <- &GenResult{
-		Root:     options.SaveTo,
-		SaveTo:   constant.WithRouter(options.Lib),
-		FileName: common.LowCasePaddingUnderline(c.Controller) + "_router" + ".go",
-		FileData: buf.Bytes(),
+		Root:        options.SaveTo,
+		SaveTo:      constant.WithRouter(options.Lib),
+		FileName:    common.LowCasePaddingUnderline(c.Controller) + "_router" + ".go",
+		FileData:    buf.Bytes(),
+		JumpExisted: true,
 	}
 	return nil
 }
@@ -320,10 +324,11 @@ func (g GoBeeApiServeGen) GenApplication(c Controller, options model.SvrOptions,
 	}
 
 	result <- &GenResult{
-		Root:     options.SaveTo,
-		SaveTo:   constant.WithApplication(common.LowCasePaddingUnderline(c.Controller)),
-		FileName: common.LowCasePaddingUnderline(c.Controller) + ".go",
-		FileData: buf.Bytes(),
+		Root:        options.SaveTo,
+		SaveTo:      constant.WithApplication(common.LowCasePaddingUnderline(c.Controller)),
+		FileName:    common.LowCasePaddingUnderline(c.Controller) + ".go",
+		FileData:    buf.Bytes(),
+		JumpExisted: true,
 	}
 	return nil
 }
@@ -375,10 +380,11 @@ func (g GoBeeApiServeGen) GenProtocol(c Controller, options model.SvrOptions, re
 				fileName = p.Operator + "_" + fileName
 			}
 			result <- &GenResult{
-				Root:     options.SaveTo,
-				SaveTo:   constant.WithProtocol(common.LowCasePaddingUnderline(c.Controller)),
-				FileName: fileName,
-				FileData: buf.Bytes(),
+				Root:        options.SaveTo,
+				SaveTo:      constant.WithProtocol(common.LowCasePaddingUnderline(c.Controller)),
+				FileName:    fileName,
+				FileData:    buf.Bytes(),
+				JumpExisted: true,
 			}
 			return nil
 		}
@@ -398,7 +404,7 @@ func (g GoBeeApiServeGen) GenProtocol(c Controller, options model.SvrOptions, re
 		SaveTo:      constant.ProtocolX,
 		FileName:    "protocol.go",
 		FileData:    []byte(protocolx),
-		CoverExists: true,
+		JumpExisted: true,
 	}
 	return nil
 }
@@ -409,7 +415,7 @@ func FileGen(results chan *GenResult) {
 	go func() {
 		for result := range results {
 			filePath := filepath.Join(result.Root, result.SaveTo, result.FileName)
-			if common.FileExists(filePath) && result.CoverExists {
+			if common.FileExists(filePath) && result.JumpExisted {
 				log.Println("【gen code】 jump:", filePath)
 				continue
 			}
@@ -430,7 +436,7 @@ type GenResult struct {
 	SaveTo      string
 	FileName    string
 	FileData    []byte
-	CoverExists bool //true=覆盖 false=不覆盖
+	JumpExisted bool //true:已存在的不在生成 false:重新生成
 }
 type Operation struct {
 	Url      ApiPath

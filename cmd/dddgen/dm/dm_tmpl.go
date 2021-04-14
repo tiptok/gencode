@@ -108,10 +108,11 @@ func (repository *{{.Model}}Repository) FindOne(queryOptions map[string]interfac
 		return m,nil
 	}
 	var options []cache.QueryOption
+    var id int64
 	if _,ok:=queryOptions["id"];!ok{
 		options = append(options,cache.WithNoCacheFlag())
 	}else {
-		m.Id = queryOptions["id"].(int64)
+		id = queryOptions["id"].(int64)
 	}
 	if err:=repository.QueryCache(cache{{.Model}}IdKey(m.Id),m,queryFunc,options...);err!=nil{
 		return nil, err

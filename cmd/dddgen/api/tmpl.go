@@ -72,7 +72,7 @@ func (controller *{{.ControllerName}}Controller) {{.Method}}() {
 const beegoRouters = `package routers
 
 import (
-	"github.com/astaxie/beego"
+	"github.com/beego/beego/v2/server/web"
 	"{{.Module}}/pkg/port/beego/controllers"
 )
 
@@ -81,24 +81,16 @@ func init() {
 }
 `
 
-const beegoRouter = `	beego.Router("{{.Url}}", &controllers.{{.Controller}}{}, "{{.HttpMethod}}:{{.Method}}")`
+const beegoRouter = `	web.Router("{{.Url}}", &controllers.{{.Controller}}{}, "{{.HttpMethod}}:{{.Method}}")`
 
 const beegoRouterInit = `package beego
 
 import (
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/plugins/cors"
 	_ "{{.Module}}/pkg/port/beego/routers"
 )
 
 func init(){
-	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Authorization", "Access-Control-Allow-Origin"},
-		ExposeHeaders:    []string{"Content-Length", "Access-Control-Allow-Origin"},
-		AllowCredentials: true,
-	}))
+
 }`
 
 const Application = `package {{.Package}}
@@ -152,7 +144,7 @@ const ProtocolModel = `package {{.Package}}
 
 import (
 	"fmt"
-	"github.com/astaxie/beego/validation"
+	"github.com/beego/beego/v2/core/validation"
 )
 
 type {{.Model}} struct {
@@ -181,16 +173,16 @@ const beegoBaseController = `package controllers
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/context"
-	"github.com/astaxie/beego/validation"
+	"github.com/beego/beego/v2/server/web"
+	"github.com/beego/beego/v2/server/web/context"
+	"github.com/beego/beego/v2/core/validation"
 	"{{.Module}}/pkg/protocol"
 	"strconv"
     "github.com/tiptok/gocomm/common" 
 )
 
 type BaseController struct {
-	beego.Controller
+	web.Controller
 }
 
 func (controller BaseController) JsonUnmarshal(v interface{}) error {
@@ -277,7 +269,7 @@ func CreateTransactionContext(options map[string]interface{}) (*transaction.Tran
 const beegoMain = `package main
 
 import (
-	"github.com/astaxie/beego"
+	"github.com/beego/beego/v2/server/web"
 	_ "{{.Module}}/pkg/constant"
 	_ "{{.Module}}/pkg/infrastructure/pg"
 	 _ "{{.Module}}/pkg/port/beego"
@@ -287,6 +279,8 @@ func main() {
 	defer func() {
 
 	}()
-	beego.BConfig.CopyRequestBody = true
-	beego.Run()
+	web.BConfig.RunMode = "dev"
+	web.BConfig.CopyRequestBody = true
+	web.BConfig.WebConfig.CommentRouterPath = "/pkg/port/beego/routers"
+	web.Run()
 }`

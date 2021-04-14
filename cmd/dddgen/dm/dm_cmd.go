@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/tiptok/gencode/cmd/dddgen/api"
 	"github.com/tiptok/gencode/common"
 	"github.com/tiptok/gencode/constant"
 	"github.com/tiptok/gencode/model"
@@ -18,8 +19,9 @@ import (
 
 func DmRun(ctx *cli.Context) {
 	var (
-		path string    = ctx.String("p")
-		o    DMOptions = DMOptions{}
+		path    string    = ctx.String("p")
+		o       DMOptions = DMOptions{}
+		results           = make(chan *api.GenResult, 100)
 	)
 	o.ProjectPath = path
 	o.SaveTo = ctx.String("st")
@@ -34,27 +36,33 @@ func DmRun(ctx *cli.Context) {
 	if len(dms) == 0 {
 		return
 	}
-	dmGen := DomainModelGenFactory()
-	dmGen.GenCommon(dms, o)
-	for i := range dms {
-		if err := dmGen.GenDomainModel(dms[i], o); err != nil {
-			log.Println(dms[i].Name, err)
-			return
+
+	dmGen := DomainModelGenFactory(results)
+	go func() {
+		dmGen.GenCommon(dms, o)
+		for i := range dms {
+			if err := dmGen.GenDomainModel(dms[i], o); err != nil {
+				log.Println(dms[i].Name, err)
+				return
+			}
+			// 值对象不需要生成持久模型/仓库模型
+			if dms[i].ValueType != string(constant.DomainModel) {
+				log.Println("jump", dms[i].ValueType, constant.DomainModel)
+				continue
+			}
+			if err := dmGen.GenPersistence(dms[i], o); err != nil {
+				log.Println(dms[i].Name, err)
+				return
+			}
+			if err := dmGen.GenRepository(dms[i], o); err != nil {
+				log.Println(dms[i].Name, err)
+				return
+			}
 		}
-		// 值对象不需要生成持久模型/仓库模型
-		if dms[i].ValueType != string(constant.DomainModel) {
-			log.Println("jump", dms[i].ValueType, constant.DomainModel)
-			continue
-		}
-		if err := dmGen.GenPersistence(dms[i], o); err != nil {
-			log.Println(dms[i].Name, err)
-			return
-		}
-		if err := dmGen.GenRepository(dms[i], o); err != nil {
-			log.Println(dms[i].Name, err)
-			return
-		}
-	}
+		close(results)
+	}()
+
+	api.FileGen(results)
 }
 
 // 从描述文件里面读取模型
@@ -81,8 +89,8 @@ func ReadDomainModels(path string) (dms []DomainModel) {
 	filepath.Walk(path, wkFunc)
 	return
 }
-func DomainModelGenFactory() DomainModelGen {
-	gen := &GoPgDomainModelGen{}
+func DomainModelGenFactory(genChan chan *api.GenResult) DomainModelGen {
+	gen := &GoPgDomainModelGen{genChan: genChan}
 	return gen
 }
 
@@ -97,7 +105,9 @@ type DomainModelGen interface {
 }
 
 //go pg domain model gen
-type GoPgDomainModelGen struct{}
+type GoPgDomainModelGen struct {
+	genChan chan *api.GenResult
+}
 
 func (g *GoPgDomainModelGen) GenDomainModel(dm DomainModel, o DMOptions) error {
 	filePath := "/pkg/domain"
@@ -132,7 +142,15 @@ func (g *GoPgDomainModelGen) GenDomainModel(dm DomainModel, o DMOptions) error {
 	if dm.ValueType == string(constant.DomainValue) {
 		fileName = "Dv" + dm.Name
 	}
-	saveTo(o, filePath, filename(fileName, "go"), bufTmpl.Bytes())
+	// saveTo(o, filePath, filename(fileName, "go"), bufTmpl.Bytes())
+
+	g.genChan <- &api.GenResult{
+		Root:        o.SaveTo,
+		SaveTo:      filePath,
+		FileName:    filename(fileName, "go"),
+		FileData:    bufTmpl.Bytes(),
+		JumpExisted: true,
+	}
 	return nil
 }
 func (g *GoPgDomainModelGen) GenRepository(dm DomainModel, o DMOptions) error {
@@ -150,7 +168,15 @@ func (g *GoPgDomainModelGen) GenRepository(dm DomainModel, o DMOptions) error {
 	m["Module"] = common.GoModuleName(o.SaveTo)
 	tP.Execute(bufTmpl, m)
 
-	return saveTo(o, filePath, filename("Pg"+dm.Name+"Repository", "go"), bufTmpl.Bytes())
+	//return saveTo(o, filePath, filename("Pg"+dm.Name+"Repository", "go"), bufTmpl.Bytes())
+	g.genChan <- &api.GenResult{
+		Root:        o.SaveTo,
+		SaveTo:      filePath,
+		FileName:    filename("Pg"+dm.Name+"Repository", "go"),
+		FileData:    bufTmpl.Bytes(),
+		JumpExisted: true,
+	}
+	return nil
 }
 func (g *GoPgDomainModelGen) GenPersistence(dm DomainModel, o DMOptions) error {
 	filePath := "/pkg/infrastructure/pg/models"
@@ -179,7 +205,15 @@ func (g *GoPgDomainModelGen) GenPersistence(dm DomainModel, o DMOptions) error {
 	}
 	tP.Execute(bufTmpl, m)
 
-	return saveTo(o, filePath, filename("Pg"+dm.Name, "go"), bufTmpl.Bytes())
+	// return saveTo(o, filePath, filename("Pg"+dm.Name, "go"), bufTmpl.Bytes())
+	g.genChan <- &api.GenResult{
+		Root:        o.SaveTo,
+		SaveTo:      filePath,
+		FileName:    filename("Pg"+dm.Name, "go"),
+		FileData:    bufTmpl.Bytes(),
+		JumpExisted: true,
+	}
+	return nil
 }
 
 func (g *GoPgDomainModelGen) GenCommon(dm []DomainModel, o DMOptions) error {
@@ -194,8 +228,17 @@ func (g *GoPgDomainModelGen) GenCommon(dm []DomainModel, o DMOptions) error {
 		log.Fatal(err)
 		return err
 	}
+	filePath := "/pkg/infrastructure/pg/transaction"
 
-	return saveTo(o, "/pkg/infrastructure/pg/transaction", filename("transaction", "go"), []byte(tmplPgTransaction))
+	//return saveTo(o,filePath , filename("transaction", "go"), []byte(tmplPgTransaction))
+	g.genChan <- &api.GenResult{
+		Root:        o.SaveTo,
+		SaveTo:      filePath,
+		FileName:    filename("transaction", "go"),
+		FileData:    []byte(tmplPgTransaction),
+		JumpExisted: true,
+	}
+	return nil
 }
 
 func (g *GoPgDomainModelGen) genConstant(dm []DomainModel, o DMOptions) error {
@@ -209,8 +252,14 @@ func (g *GoPgDomainModelGen) genConstant(dm []DomainModel, o DMOptions) error {
 	m := make(map[string]string)
 	tP.Execute(bufTmpl, m)
 
-	saveTo(o, filePath, filename("postgresql", "go"), bufTmpl.Bytes())
-
+	//saveTo(o, filePath, filename("postgresql", "go"), bufTmpl.Bytes())
+	g.genChan <- &api.GenResult{
+		Root:        o.SaveTo,
+		SaveTo:      filePath,
+		FileName:    filename("postgresql", "go"),
+		FileData:    bufTmpl.Bytes(),
+		JumpExisted: true,
+	}
 	return nil
 }
 func (g *GoPgDomainModelGen) genPgInit(dm []DomainModel, o DMOptions) error {
@@ -233,8 +282,14 @@ func (g *GoPgDomainModelGen) genPgInit(dm []DomainModel, o DMOptions) error {
 	m["Module"] = o.ModulePath
 	tP.Execute(bufTmpl, m)
 
-	saveTo(o, filePath, filename("init", "go"), bufTmpl.Bytes())
-
+	//saveTo(o, filePath, filename("init", "go"), bufTmpl.Bytes())
+	g.genChan <- &api.GenResult{
+		Root:        o.SaveTo,
+		SaveTo:      filePath,
+		FileName:    filename("init", "go"),
+		FileData:    bufTmpl.Bytes(),
+		JumpExisted: true,
+	}
 	return nil
 }
 

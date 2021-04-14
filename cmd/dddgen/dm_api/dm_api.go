@@ -126,10 +126,11 @@ func (g GoBeeDomainApiServeGen) GenApplication(c api.Controller, options model.S
 	}
 
 	result <- &api.GenResult{
-		Root:     options.SaveTo,
-		SaveTo:   constant.WithApplication(common.LowCasePaddingUnderline(c.Controller)),
-		FileName: common.LowCasePaddingUnderline(c.Controller) + ".go",
-		FileData: buf.Bytes(),
+		Root:        options.SaveTo,
+		SaveTo:      constant.WithApplication(common.LowCasePaddingUnderline(c.Controller)),
+		FileName:    common.LowCasePaddingUnderline(c.Controller) + ".go",
+		FileData:    buf.Bytes(),
+		JumpExisted: true,
 	}
 	return nil
 }
@@ -182,10 +183,11 @@ func (g GoBeeDomainApiServeGen) GenProtocol(c api.Controller, options model.SvrO
 				fileName = p.Operator + "_" + fileName
 			}
 			result <- &api.GenResult{
-				Root:     options.SaveTo,
-				SaveTo:   constant.WithProtocol(common.LowCasePaddingUnderline(c.Controller)),
-				FileName: fileName,
-				FileData: buf.Bytes(),
+				Root:        options.SaveTo,
+				SaveTo:      constant.WithProtocol(common.LowCasePaddingUnderline(c.Controller)),
+				FileName:    fileName,
+				FileData:    buf.Bytes(),
+				JumpExisted: true,
 			}
 			return nil
 		}
