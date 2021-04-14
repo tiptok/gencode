@@ -1,0 +1,42 @@
+{
+	"name":"OperatorLog",
+	"value_type":"domain-model",
+	"property":["restful"],
+	"fields":[
+		{
+			"name":"Id",
+			"type":"int64",
+			"desc":"唯一标识"
+		},
+		{
+			"name":"UserId",
+			"type":"int64",
+			"desc":"用户编号"
+		},
+		{
+			"name":"Commiter",
+			"type":"string",
+			"desc":"提交人"
+		},
+		{
+			"name":"Code",
+			"type":"string",
+			"desc":"日志编号码 : EditModuleFile"
+		},
+		{
+			"name":"ResourceId",
+			"type":"int64",
+			"desc":"关联资源id"
+		},
+		{
+			"name":"Content",
+			"type":"string",
+			"desc":"变更内容"
+		},
+		{
+			"name":"CreateTime",
+			"type":"time.Time",
+			"desc":"创建时间"
+		}
+	]
+}

@@ -1,0 +1,31 @@
+{
+    "controller": "Other",
+    "paths": [
+        {
+            "path": "/other/import",
+            "method": "post",
+            "summary": "权限列表",
+            "content": "json",
+			"operator":"command",
+            "request": {
+                "ref": "/api/protocol/other/ImportRequest"
+            },
+            "response": {
+                "ref": "/api/protocol/other/ImportResponse"
+            }
+        },
+		{
+            "path": "/other/patchTag",
+            "method": "post",
+            "summary": "权限列表",
+            "content": "json",
+			"operator":"command",
+            "request": {
+                "ref": "/api/protocol/other/PatchTagRequest"
+            },
+            "response": {
+                "ref": "/api/protocol/other/PatchTagResponse"
+            }
+        }
+    ]
+}

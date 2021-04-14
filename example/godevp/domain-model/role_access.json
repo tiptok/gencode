@@ -1,0 +1,36 @@
+﻿{
+	"name":"RoleAccess",
+	"value_type":"domain-model",
+	"fields":[
+		{
+			"name":"Id",
+			"type":"int64",
+			"desc":"唯一标识"
+		},
+		{
+			"name":"RoleId",
+			"type":"int64",
+			"desc":"角色id"
+		},
+		{
+			"name":"AccessId",
+			"type":"int64",
+			"desc":"权限编号"
+		},
+		{
+			"name":"Object",
+			"type":"string",
+			"desc":"请求对象 接口地址/对象"
+		},
+		{
+			"name":"Action",
+			"type":"string",
+			"desc":"操作方法 httpMethod/read/write"
+		},
+		{
+			"name":"Option",
+			"type":"string",
+			"desc":"可选对象"
+		}
+	]
+}

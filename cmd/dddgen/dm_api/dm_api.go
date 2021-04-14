@@ -242,7 +242,7 @@ func (g GoBeeDomainApiServeGen) getApplicationLogic(c api.Controller, path api.A
 	if {{.domain}},err={{.Domain}}Repository.FindOne(map[string]interface{}{"id":request.Id});err!=nil{
 		return
 	}
-	if err ={{.domain}}.Update(common.ObjectToMap(request));err!=nil{
+	if err ={{.domain}}.Update(common.LoadCustomFieldToMap(request, header.BodyKeys...));err!=nil{
 		return
 	}
 	if {{.domain}},err = {{.Domain}}Repository.Save({{.domain}});err!=nil{

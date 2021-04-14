@@ -1,4 +1,4 @@
-## 使用教程
+# 使用教程
 ```
 1. mkdir Project
 2. cd Project & go mod init github.com/tiptok/xx
@@ -11,6 +11,7 @@
 go run gencode.go api-dsl -p F://go//src//learn_project//ddd-project//order -c Order - url controller/orderList
 go run gencode.go api-svr -p F://go//src//learn_project//ddd-project//order --st F://go//src//order
 go run gencode.go dm -p F://go//src//learn_project//ddd-project//order  --st F://go//src//order
+go run gencode.go pkg -t add -st F://go//src//learn_project//ddd-project//order  -lib redis -lang go
 
 注：
 dsl/Project 描述语言项目地址
@@ -36,8 +37,65 @@ go run gencode.go dm -p F://go//src//learn_project//ddd-project//stock  --st F:/
 - [x] api-dsl 生成描述语言
 - [x] api-svr 根据描述语言生成服务代码
 - [x] dm      根据描述语言（domain-model）生成,存储模型,领域模型
-- [ ] api-svr -t api-dsl dm-dsl 生成对应svr
+- [x] api-svr 根据领域模型生成对应restful服务
 - [ ] dsl     生成描述语言 ( -t api/dm/dm-svr/event)
 - [ ] swagger 生成swagger文档
 - [ ] btt     生成自动化测试代码 (BTT)
-- [ ] arch-ref自动引入架构 (redis/broker/)
+- [x] pkg -t add 自动引入架构
+  - [x] redis
+  - [ ] broker
+
+## 文档编写
+
+### project/api
+```json
+{
+	"controller": "Company",
+	"paths": [{
+			"path": "/company/property",
+			"method": "post",
+			"summary": "测试",
+			"content": "json",
+			"request": {
+				"ref": "/api/protocol/company/PropertyRequest"
+			},
+			"response": {
+				"ref": "/api/protocol/company/PropertyResponse"
+			}
+		},
+	]
+}
+controller : 控制器名称
+paths: []  路由方法
+  	path： 路径
+  	method: 方法类型 post,get,delete,put
+  	summary:描述
+  	content：请求体 json
+  	request
+  	    ref: 请求体描述文件地址 /api/protocol/company/PropertyRequest
+  	response
+  	    ref: 应答体描述文件地址 /api/protocol/company/PropertyResponse
+```
+
+### project/domain-model
+```json
+{
+	"name":"Users",
+	"value_type":"domain-model",
+	"property":["restful"],
+	"fields":[
+		{
+			"name":"Id",
+			"type":"int64",
+            "desc":"唯一标识"
+        },
+    ]
+}
+name: users 模型名称
+value_type : domain-model(领域模型)  domain-value(值对象)
+property: [ ] 默认空,可选值: "restful"(包含restful服务)
+fields: [ ]   属性
+    name： 属性名称
+    type： 类型
+    desc： 描述
+```

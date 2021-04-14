@@ -1,0 +1,42 @@
+{
+	"name":"ProjectModuleVersion",
+	"value_type":"domain-model",
+	"property":["restful"],
+	"fields":[
+		{
+			"name":"Id",
+			"type":"int64",
+			"desc":"唯一标识"
+		},
+		{
+			"name":"ProjectModuleId",
+			"type":"int64",
+			"desc":"项目编号"
+		},
+		{
+			"name":"Version",
+			"type":"string",
+			"desc":"版本号"
+		},
+		{
+			"name":"Description",
+			"type":"string",
+			"desc":"项目描述信息"
+		},
+		{
+			"name":"Status",
+			"type":"int",
+			"desc":"状态 0:正常 1:删除"
+		},
+		{
+			"name":"CreateTime",
+			"type":"time.Time",
+			"desc":"创建时间"
+		},
+		{
+			"name":"UpdateTime",
+			"type":"time.Time",
+			"desc":"更新时间"
+		}
+	]
+}

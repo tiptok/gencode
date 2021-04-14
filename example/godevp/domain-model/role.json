@@ -1,0 +1,32 @@
+{
+	"name":"Role",
+	"value_type":"domain-model",
+	"property":["restful"],
+	"fields":[
+		{
+			"name":"Id",
+			"type":"int64",
+			"desc":"唯一标识"
+		},
+		{
+			"name":"RoleName",
+			"type":"string",
+			"desc":"角色名称"
+		},
+		{
+			"name":"ParentId",
+			"type":"int64",
+			"desc":"父级Id"
+		},
+		{
+			"name":"CreateTime",
+			"type":"time.Time",
+			"desc":"创建时间"
+		},
+		{
+			"name":"UpdateTime",
+			"type":"time.Time",
+			"desc":"更新时间"
+		}
+	]
+}

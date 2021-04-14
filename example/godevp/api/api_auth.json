@@ -1,0 +1,83 @@
+{
+    "controller": "Auth",
+    "paths": [
+        {
+            "path": "/auth/login",
+            "method": "post",
+            "summary": "登录",
+            "content": "json",
+			"operator":"command",
+            "request": {
+                "ref": "/api/protocol/auth/LoginRequest"
+            },
+            "response": {
+                "ref": "/api/protocol/auth/LoginResponse"
+            }
+        },
+        {
+            "path": "/auth/logout",
+            "method": "post",
+            "summary": "测试",
+            "content": "json",
+			"operator":"command",
+            "request": {
+                "ref": "/api/protocol/auth/LogoutRequest"
+            },
+            "response": {
+                "ref": "/api/protocol/auth/LogoutResponse"
+            }
+        },
+		{
+            "path": "/auth/refresh",
+            "method": "post",
+            "summary": "权限刷新",
+            "content": "json",
+			"operator":"command",
+            "request": {
+                "ref": "/api/protocol/auth/RefreshRequest"
+            },
+            "response": {
+                "ref": "/api/protocol/auth/RefreshResponse"
+            }
+        },
+		{
+            "path": "/auth/profile",
+            "method": "post",
+            "summary": "获取当前用户数据",
+            "content": "json",
+			"operator":"command",
+            "request": {
+                "ref": "/api/protocol/auth/ProfileRequest"
+            },
+            "response": {
+                "ref": "/api/protocol/auth/ProfileResponse"
+            }
+        },
+		{
+            "path": "/auth/captchaInit",
+            "method": "get",
+            "summary": "图形验证码初始化",
+            "content": "json",
+			"operator":"query",
+            "request": {
+                "ref": "/api/protocol/auth/CaptchaInitRequest"
+            },
+            "response": {
+                "ref": "/api/protocol/auth/CaptchaInitResponse"
+            }
+        },
+		{
+            "path": "/auth/changePassword",
+            "method": "post",
+            "summary": "修改密码",
+            "content": "json",
+			"operator":"command",
+            "request": {
+                "ref": "/api/protocol/auth/ChangePasswordRequest"
+            },
+            "response": {
+                "ref": "/api/protocol/auth/ChangePasswordResponse"
+            }
+        }
+    ]
+}

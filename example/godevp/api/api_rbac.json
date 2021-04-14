@@ -1,0 +1,44 @@
+{
+    "controller": "Rbac",
+    "paths": [
+        {
+            "path": "/rbac/access",
+            "method": "post",
+            "summary": "权限列表",
+            "content": "json",
+			"operator":"query",
+            "request": {
+                "ref": "/api/protocol/rbac/AccessRequest"
+            },
+            "response": {
+                "ref": "/api/protocol/rbac/AccessResponse"
+            }
+        },
+        {
+            "path": "/rbac/roleAccess",
+            "method": "post",
+            "summary": "获取角色权限",
+            "content": "json",
+			"operator":"query",
+            "request": {
+                "ref": "/api/protocol/rbac/RoleAccessRequest"
+            },
+            "response": {
+                "ref": "/api/protocol/rbac/RoleAccessResponse"
+            }
+        },
+		{
+            "path": "/rbac/setRoleAccess",
+            "method": "post",
+            "summary": "设置权限",
+            "content": "json",
+			"operator":"command",
+            "request": {
+                "ref": "/api/protocol/rbac/SetRoleAccessRequest"
+            },
+            "response": {
+                "ref": "/api/protocol/rbac/SetRoleAccessResponse"
+            }
+        }
+    ]
+}

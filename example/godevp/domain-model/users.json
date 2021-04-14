@@ -1,0 +1,52 @@
+{
+	"name":"Users",
+	"value_type":"domain-model",
+	"property":["restful"],
+	"fields":[
+		{
+			"name":"Id",
+			"type":"int64",
+            "desc":"唯一标识"
+        },
+        {
+			"name":"Name",
+			"type":"string",
+            "desc":"名称"
+		},
+        {
+			"name":"Phone",
+			"type":"string",
+            "desc":"手机号"
+		},
+        {
+			"name":"Passwd",
+			"type":"string",
+            "desc":"密码"
+		},
+		{
+			"name":"Roles",
+			"type":"[]int64",
+            "desc":"用户角色"
+		},
+		{
+			"name":"Status",
+			"type":"int",
+            "desc":"1:启用 2:禁用"
+		},
+		{
+			"name":"AdminType",
+			"type":"int",
+            "desc":"1:管理员  2：普通员工"
+		},
+		{
+			"name":"CreateTime",
+			"type":"time.Time",
+			"desc":"创建时间"
+		},
+		{
+			"name":"UpdateTime",
+			"type":"time.Time",
+			"desc":"更新时间"
+		}
+	]
+}

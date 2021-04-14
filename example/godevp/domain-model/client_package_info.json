@@ -1,0 +1,17 @@
+{
+	"name":"ClientPackageInfo",
+	"value_type":"value-model",
+	"property":[],
+	"fields":[
+		{
+			"name":"FileName",
+			"type":"string",
+			"desc":"角色名称"
+		},
+		{
+			"name":"Path",
+			"type":"string",
+			"desc":"文件路径"
+		}
+	]
+}

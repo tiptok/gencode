@@ -1,0 +1,46 @@
+﻿{
+	"name":"CasbinRule",
+	"value_type":"domain-model",
+	"fields":[
+		{
+			"name":"Id",
+			"type":"int64",
+            "desc":"唯一标识"
+        },
+		{
+			"name":"PType",
+			"type":"string",
+			"desc":"规则类型:p g"
+		},
+		{
+			"name":"V0",
+			"type":"string",
+			"desc":"值0 sub:role_id"
+		},
+		{
+			"name":"V1",
+			"type":"string",
+			"desc":"值1 object:请求对象 接口地址/对象"
+		},
+		{
+			"name":"V2",
+			"type":"string",
+			"desc":"值2 action:操作方法 httpMethod/read/write"
+		},
+		{
+			"name":"V3",
+			"type":"string",
+			"desc":"值3 扩展字段 access_id"
+		},
+		{
+			"name":"V4",
+			"type":"string",
+			"desc":"值4 扩展字段"
+		},
+		{
+			"name":"V5",
+			"type":"string",
+			"desc":"值5 扩展字段"
+		}
+	]
+}

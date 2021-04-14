@@ -293,3 +293,9 @@ func NewPGTransactionContext(pgDd *pg.DB) *TransactionContext {
 	}
 }
 `
+
+const factoryRepository = `
+func Create{{.Model}}Repository(transactionContext *transaction.TransactionContext) (domain.{{.Model}}Repository, error) {
+	return repository.New{{.Model}}Repository(transactionContext)
+}
+`

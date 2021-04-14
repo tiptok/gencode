@@ -228,6 +228,8 @@ func (g *GoPgDomainModelGen) GenCommon(dm []DomainModel, o DMOptions) error {
 		log.Fatal(err)
 		return err
 	}
+
+	g.genFactoryRepository(dm, o)
 	filePath := "/pkg/infrastructure/pg/transaction"
 
 	//return saveTo(o,filePath , filename("transaction", "go"), []byte(tmplPgTransaction))
@@ -289,6 +291,34 @@ func (g *GoPgDomainModelGen) genPgInit(dm []DomainModel, o DMOptions) error {
 		FileName:    filename("init", "go"),
 		FileData:    bufTmpl.Bytes(),
 		JumpExisted: true,
+	}
+	return nil
+}
+
+// gen /application/transaction  by persistence
+func (g *GoPgDomainModelGen) genFactoryRepository(dm []DomainModel, o DMOptions) (err error) {
+	var filePath = "/pkg/application/factory"
+	tP, err := template.New("factoryRepository").Parse(factoryRepository)
+	if err != nil {
+		log.Fatal(err)
+	}
+	buf := bytes.NewBuffer(nil)
+	buf.WriteString("package factory \n")
+	for _, v := range dm {
+		if v.ValueType != string(constant.DomainModel) {
+			continue
+		}
+		bufTmpl := bytes.NewBuffer(nil)
+		m := make(map[string]string)
+		m["Model"] = v.Name
+		tP.Execute(bufTmpl, m)
+		buf.Write(bufTmpl.Bytes())
+	}
+	g.genChan <- &api.GenResult{
+		Root:     o.SaveTo,
+		SaveTo:   filePath,
+		FileName: filename("repository", "go"),
+		FileData: buf.Bytes(),
 	}
 	return nil
 }

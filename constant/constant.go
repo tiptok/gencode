@@ -28,7 +28,7 @@ type DomainType string
 
 const (
 	DomainModel DomainType = "domain-model"
-	DomainValue DomainType = "domain-value"
+	DomainValue DomainType = "value-model"
 )
 
 type HttpLib string
