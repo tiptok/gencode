@@ -50,7 +50,7 @@ func (controller *{{.ControllerName}}Controller) {{.Method}}() {
 	}()
 	{{if eq .HttpMethod "POST" "PUT"}}
     if err := controller.JsonUnmarshal(request); err != nil {
-		msg = protocol.NewResponseMessage(2,err.Error())
+		msg = protocol.NewResponseMessage(protocol.InvalidArgs,err.Error())
 		return
 	}{{end}}
     {{if eq .HttpMethod  "DELETE" "PUT"}}
@@ -123,7 +123,7 @@ const ApplicationMethod = `func(svr *{{.Service}}Service){{.Method}}(header *pro
 	)
 	rsp = &protocolx.{{.Method}}Response{}
 	if err=request.ValidateCommand();err!=nil{
-		err = protocol.NewCustomMessage(2,err.Error())
+		err = protocol.NewErrorMessage(protocol.InvalidArgs,err.Error())
 		return
 	}
 	if err = transactionContext.StartTransaction(); err != nil {
@@ -208,7 +208,7 @@ func (controller *BaseController) Valid(obj interface{}) (result bool, msg *prot
 	if err != nil {
 	}
 	if !result {
-		msg = protocol.BadRequestParam(2)
+		msg = protocol.NewMessage(protocol.InvalidArgs)
 		return
 	}
 
@@ -235,8 +235,8 @@ func (controller *BaseController)  Resp(msg *protocol.ResponseMessage) {
 }
 
 func (controller *BaseController) RespH5(msg *protocol.ResponseMessage) {
-	if msg.Errno != 0 {
-		msg.Errno = -1
+	if msg.Code != 0 {
+		msg.Code = -1
 	}
 	controller.Data["json"] = msg
 	controller.Ctx.Input.SetData("outputData", msg)

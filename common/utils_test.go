@@ -55,3 +55,10 @@ func TestGoModuleName(t *testing.T) {
 	module := GoModuleName("F://go//src//stock")
 	t.Log(module)
 }
+
+func TestGoProjectName(t *testing.T) {
+	projectName := GoProjectName("github.com/tiptok/gencode")
+	if projectName != "gencode" {
+		t.Fatal(projectName)
+	}
+}

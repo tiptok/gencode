@@ -36,20 +36,11 @@ const tmplProtocolDomainPgRepository = `package repository
 import (
 	"fmt"
 	"{{.Module}}/pkg/domain"
-	"{{.Module}}/pkg/constant"
 	"{{.Module}}/pkg/infrastructure/pg/models"
 	"{{.Module}}/pkg/infrastructure/pg/transaction"
 	. "github.com/tiptok/gocomm/pkg/orm/pgx"
 	"github.com/tiptok/gocomm/common"
 	"github.com/tiptok/gocomm/pkg/cache"
-)
-
-var (
-	cache{{.Model}}IdKey = func(id int64)string{
-		return fmt.Sprintf("%v:cache:{{.Model}}:id:%v",{{.DBName}},id)
- 		// 不需要执行缓存时,key设置为空
-		// return ""
-	}
 )
 
 type {{.Model}}Repository struct {
@@ -76,7 +67,7 @@ func (repository *{{.Model}}Repository) Save(dm *domain.{{.Model}}) (*domain.{{.
 	queryFunc:=func()(interface{},error){
 		return tx.Model(m).WherePK().Update()
 	}
-	if _, err = repository.Query(queryFunc,cache{{.Model}}IdKey(dm.Id)); err != nil {
+	if _, err = repository.Query(queryFunc,m.CacheKeyFunc()); err != nil {
 		return nil, err
 	}
 	return dm, nil
@@ -90,7 +81,7 @@ func (repository *{{.Model}}Repository) Remove(dm *domain.{{.Model}}) (*domain.{
 	queryFunc:=func()(interface{},error){
 		return tx.Model(m).Where("id = ?", dm.Id).Delete()
 	}
-	if _,err:=repository.Query(queryFunc,cache{{.Model}}IdKey(dm.Id));err!=nil{
+	if _,err:=repository.Query(queryFunc,m.CacheKeyFunc());err!=nil{
 		return dm, err
 	}
 	return dm, nil
@@ -107,14 +98,11 @@ func (repository *{{.Model}}Repository) FindOne(queryOptions map[string]interfac
 		}
 		return m,nil
 	}
-	var options []cache.QueryOption
-    var id int64
-	if _,ok:=queryOptions["id"];!ok{
-		options = append(options,cache.WithNoCacheFlag())
-	}else {
-		id = queryOptions["id"].(int64)
+    var cacheModel = new(models.{{.Model}})
+	if _,ok:=queryOptions["id"];ok{
+		cacheModel.Id = queryOptions["id"].(int64)
 	}
-	if err:=repository.QueryCache(cache{{.Model}}IdKey(m.Id),m,queryFunc,options...);err!=nil{
+	if err:=repository.QueryCache(cacheModel.CacheKeyFunc,m,queryFunc);err!=nil{
 		return nil, err
 	}
 	if m.Id == 0 {
@@ -160,9 +148,19 @@ func New{{.Model}}Repository(transactionContext *transaction.TransactionContext)
 
 const tmplProtocolPgModel = `package models
 
+import (
+	"fmt"
+)
+
 // {{.Desc}}
 type {{.Model}} struct {
 {{.Items}}
+}
+func (m *{{.Model}}) CacheKeyFunc() string {
+	if m.Id==0{
+		return ""
+	}
+	return fmt.Sprintf("{{.ProjectName}}:cache:{{.Model}}:id:%v", m.Id)
 }
 `
 
@@ -210,7 +208,7 @@ import (
 	"fmt"
 	"github.com/go-pg/pg/v10"
 	"github.com/go-pg/pg/v10/orm"
-	"{{.Module}}/pkg/constant"
+    "{{.Module}}/pkg/constant"
 	"{{.Module}}/pkg/infrastructure/pg/models"
 )
 

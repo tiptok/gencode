@@ -14,6 +14,8 @@ type Field struct {
 }
 
 type SvrOptions struct {
+	// 项目名称
+	ProjectName string
 	// mod 路径
 	ModulePath string
 	// 项目路径

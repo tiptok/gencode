@@ -76,3 +76,14 @@ func GoModuleName(work string) string {
 	module := strings.Split(string(line), " ")[1]
 	return strings.Trim(module, "\n")
 }
+
+func GoProjectName(module string) string {
+	if strings.Index(module, "/") <= 0 && len(module) > 0 {
+		return module
+	}
+	index := strings.LastIndex(module, "/")
+	if index <= 0 {
+		return "default"
+	}
+	return module[index+1:]
+}

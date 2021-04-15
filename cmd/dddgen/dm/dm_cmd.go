@@ -28,6 +28,7 @@ func DmRun(ctx *cli.Context) {
 	o.DataPersistence = ctx.String("dp")
 	o.Language = ctx.String("lang")
 	o.ModulePath = common.GoModuleName(o.SaveTo)
+	o.ProjectName = common.GoProjectName(o.ModulePath)
 	readPath := path
 	if !strings.Contains(readPath, "domain-model") {
 		readPath = filepath.Join(path, "domain-model")
@@ -200,6 +201,7 @@ func (g *GoPgDomainModelGen) GenPersistence(dm DomainModel, o DMOptions) error {
 	m["Model"] = dm.Name
 	m["Items"] = buf.String()
 	m["Desc"] = dm.Desc
+	m["ProjectName"] = o.ProjectName
 	if len(dm.Desc) == 0 {
 		m["Desc"] = dm.Name
 	}
@@ -272,6 +274,9 @@ func (g *GoPgDomainModelGen) genPgInit(dm []DomainModel, o DMOptions) error {
 	}
 	buf := bytes.NewBuffer(nil)
 	for i := range dm {
+		if dm[i].ValueType != string(constant.DomainModel) {
+			continue
+		}
 		m := dm[i].Name
 		buf.WriteString(fmt.Sprintf("			(*models.%v)(nil),", m))
 		if i != len(dm)-1 {

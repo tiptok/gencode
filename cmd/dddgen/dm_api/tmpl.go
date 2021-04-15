@@ -6,7 +6,7 @@ const applicationMethod = `func(svr *{{.Service}}Service){{.Method}}(header *pro
 	)
 	rsp = &protocolx.{{.Method}}Response{}
 	if err=request.ValidateCommand();err!=nil{
-		err = protocol.NewCustomMessage(2,err.Error())
+		err = protocol.NewErrorMessage(protocol.InvalidArgs,err.Error())
 		return
 	}
 	if err = transactionContext.StartTransaction(); err != nil {
